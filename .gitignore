@@ -1,0 +1,53 @@
+# ---- Secrets & credentials (NEVER commit) ----
+.env
+.env.*
+*.pem
+*.key
+secrets.*
+credentials.*
+.netrc
+
+# ---- Licensed data guard ----
+# The open-source repo must contain SEC EDGAR / public-domain data only.
+# Bulk data dumps are blocked by default. To commit a genuinely public
+# dataset, add an explicit negation below (e.g. !data/public/edgar_facts.csv)
+# and state its source in the PR.
+data/
+*.csv
+*.tsv
+*.parquet
+*.xlsx
+*.xls
+*.db
+*.sqlite3
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---- Notebooks ----
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# ---- IDE / editors ----
+.vscode/
+.idea/
+.antigravity/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---- Agent tooling (local config may contain tokens) ----
+.claude/
+.mcp.json

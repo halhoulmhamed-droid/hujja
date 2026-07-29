@@ -1,0 +1,77 @@
+name: Rule correction
+description: Report a threshold, denominator, window, or citation that does not match the official source
+title: "[rule] "
+labels: ["rule-correction", "needs-source-check"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Reporting a wrong rule is the most valuable contribution to this project.
+
+        Please cite and link the official source rather than pasting long passages of it —
+        the standards are copyrighted, and a citation plus a link is enough.
+
+  - type: input
+    id: standard
+    attributes:
+      label: Standard affected
+      placeholder: "AAOIFI SS21 / DJIM / FTSE IdealRatings / FTSE Shariah (Yasaar) / MSCI Islamic / MSCI Islamic M Series / SC Malaysia"
+    validations:
+      required: true
+
+  - type: textarea
+    id: stated
+    attributes:
+      label: What this repository currently states
+      description: Quote the line or table cell, and say where it appears (file, section).
+    validations:
+      required: true
+
+  - type: textarea
+    id: correct
+    attributes:
+      label: What the official source states
+      description: Describe the correct threshold, numerator, denominator, or averaging window.
+    validations:
+      required: true
+
+  - type: input
+    id: source_url
+    attributes:
+      label: Official source URL
+      placeholder: "https://..."
+    validations:
+      required: true
+
+  - type: input
+    id: source_version
+    attributes:
+      label: Source version and/or date
+      placeholder: "e.g. Methodology, February 2026"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      options:
+        - Would change verdicts
+        - Documentation or citation only
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else
+      description: Optional. Background, related changes to the standard, prior versions.
+
+  - type: checkboxes
+    id: ack
+    attributes:
+      label: Acknowledgement
+      options:
+        - label: I have not pasted substantial verbatim text from a copyrighted standard.
+          required: true
