@@ -1,0 +1,86 @@
+schema_version: "1.0.0"
+
+rule_file:
+  id: djim_spdji
+  version: "1.0.0"
+
+standard:
+  id: DJIM_SPDJI
+  name: "Dow Jones Islamic Market Index"
+  provider: "S&P Dow Jones Indices"
+
+methodology:
+  title: "Dow Jones Islamic Market Indices Methodology"
+  version: "2026-02"
+  official_url: "https://www.spglobal.com/spdji/en/documents/methodologies/methodology-dj-islamic-market-indices.pdf"
+  verified_on: "2026-07-28"
+
+review:
+  status: unreviewed
+  reviewer: null
+  scope: null
+  date: null
+
+business_activity_screen:
+  excluded_sectors:
+    - id: alcohol
+      label: "Alcohol"
+    - id: tobacco_ecigarettes
+      label: "Tobacco and electronic cigarettes"
+    - id: recreational_cannabis
+      label: "Recreational cannabis"
+    - id: pork_related
+      label: "Pork-related products"
+    - id: conventional_financial_services
+      label: "Conventional (non-Islamic) financial services"
+    - id: non_defense_weapons
+      label: "Weapons and related systems deployed for purposes other than defense, including spyware"
+    - id: gambling
+      label: "Gambling"
+    - id: adult_entertainment
+      label: "Adult entertainment"
+  tolerance_test:
+    id: djim_revenue_tolerance
+    label: "Non-permissible revenue tolerance"
+    description: >
+      Revenue tied to the excluded sectors above, plus all interest income
+      (operating and non-operating), tested against total revenue including
+      that interest income. The fact non_permissible_activity_revenue must
+      exclude all interest income, since interest income enters this ratio
+      separately through interest_income_operating and
+      interest_income_non_operating.
+    numerator:
+      facts: [non_permissible_activity_revenue, interest_income_operating, interest_income_non_operating]
+    denominator:
+      facts: [total_operating_revenue, interest_income_operating, interest_income_non_operating]
+    comparator: "<"
+    threshold: 0.05
+    evaluation_frequency: null
+
+ratio_screens:
+  - id: djim_leverage_compliance
+    label: "Leverage Compliance"
+    description: >
+      Total interest-bearing debt against a trailing 24-month average market
+      capitalization. This is DJIM's single remaining accounting screen -- the
+      former accounts-receivable screen (removed March 2023) and the former
+      cash-plus-interest-bearing-securities screen (removed September 2023) no
+      longer apply. Separately, DJIM publishes a dividend purification ratio,
+      which the methodology explicitly labels a purification aid and not a
+      compliance ratio; it is therefore deliberately not encoded as a screen
+      here.
+    numerator:
+      facts: [total_interest_bearing_debt]
+    denominator:
+      facts: [market_capitalization]
+      averaging_window:
+        unit: months
+        length: 24
+        method: trailing_average
+    comparator: "<"
+    threshold: 0.33
+    evaluation_frequency: null
+    transition_buffer:
+      tolerance_band: 0.02
+      consecutive_periods_before_flip: 3
+      immediate_breach_beyond_band: true
