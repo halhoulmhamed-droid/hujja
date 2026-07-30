@@ -51,3 +51,9 @@ Thumbs.db
 # ---- Agent tooling (local config may contain tokens) ----
 .claude/
 .mcp.json
+
+# Local strategy document (not published)
+HUJJA-MASTER-PROMPT.md
+
+# Local operating brief for Claude Code (not published)
+CLAUDE.md
