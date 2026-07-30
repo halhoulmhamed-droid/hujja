@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 authors = [
-    { name = "Mhamed Halhoul" },
+    { name = "Mhamed Halhoul", email = "contact@hujja.dev" },
 ]
 keywords = [
     "shariah",
@@ -32,8 +32,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/halhoulmhamed-droid/hujja"
-Repository = "https://github.com/halhoulmhamed-droid/hujja"
+Homepage = "https://hujja.dev"
+Documentation = "https://hujja.dev"
+Source = "https://github.com/halhoulmhamed-droid/hujja"
 Issues = "https://github.com/halhoulmhamed-droid/hujja/issues"
 
 [tool.setuptools.packages.find]

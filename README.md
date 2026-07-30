@@ -2,13 +2,13 @@
 
 > **Name.** *Hujja* (حجة — "proof, evidence"): in Islamic legal reasoning, the probative
 > argument that establishes a claim. That is precisely what this engine is built to
-> produce. PyPI and GitHub namespaces verified free on 29 July 2026; trademark clearance
-> in MENA jurisdictions is still pending.
+> produce. The PyPI and GitHub namespaces and the hujja.dev domain were secured on
+> 29 July 2026; trademark clearance in MENA jurisdictions is still pending.
 
 **Hujja screens stocks for Shariah compliance using auditable, versioned rules — and returns one
 verdict per standard, never a merged black-box answer.**
 
-`License: Apache-2.0` · `PyPI: planned` · `MCP server: planned` · `Status: pre-alpha`
+`License: Apache-2.0` · `PyPI: hujja 0.0.1` · `MCP server: planned` · `Status: pre-alpha`
 
 > **This is not a fatwa and this is not investment advice.** Hujja is an informational and
 > educational tool. Its verdicts are mechanical applications of published screening methodologies
