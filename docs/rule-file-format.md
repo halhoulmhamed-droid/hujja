@@ -7,7 +7,8 @@ A rule file encodes one screening standard as data. Changing a threshold, a comp
 denominator, or an averaging window is a change to a rule file — never a change to engine code.
 
 Rule files are written in YAML and validated against
-[`schemas/rule-file.schema.json`](../schemas/rule-file.schema.json) (JSON Schema draft 2020-12) at
+[`src/hujja/schemas/rule-file.schema.json`](../src/hujja/schemas/rule-file.schema.json) (JSON
+Schema draft 2020-12) at
 load time. `additionalProperties` is `false` throughout, so an unknown or misspelled field fails
 loudly instead of being silently ignored.
 

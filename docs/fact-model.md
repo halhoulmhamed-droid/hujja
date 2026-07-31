@@ -1,6 +1,7 @@
 # Hujja fact model
 
-**Status:** draft. Derived from [`rules/djim_spdji.yaml`](../rules/djim_spdji.yaml) — this is the
+**Status:** draft. Derived from
+[`src/hujja/rules/djim_spdji.yaml`](../src/hujja/rules/djim_spdji.yaml) — this is the
 exact set of normalized inputs DJIM requires, and nothing more. Other standards extend it once
 their official sources are verified.
 
