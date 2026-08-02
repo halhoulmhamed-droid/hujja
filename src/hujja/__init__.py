@@ -1,6 +1,8 @@
 """Hujja - open-source rules-as-code Shariah stock screening engine.
 
-Pre-alpha: name reservation only. No screening logic is implemented yet.
+Pre-alpha: the versioned DJIM rule file, JSON Schema, fact model,
+and validation suite are published.
+The loader and execution engine are not yet implemented.
 See https://github.com/halhoulmhamed-droid/hujja
 """
 
