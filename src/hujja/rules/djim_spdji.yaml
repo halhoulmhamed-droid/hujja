@@ -1,19 +1,43 @@
-schema_version: "1.0.0"
+# Hujja rule file -- Dow Jones Islamic Market Index (S&P Dow Jones Indices).
+#
+# Documentary resolution below is stated against the DECLARED REVIEWED EVIDENCE
+# SET for this rule file: the official methodology editions and locators listed
+# under `source_evidence`. Where a claim carries no locator, that means this
+# evidence set does not establish it -- not that every possible source is silent.
+#
+# Nothing here is a fatwa or investment advice. Consult a qualified scholar.
+
+schema_version: "2.0.0"
 
 rule_file:
   id: djim_spdji
-  version: "1.0.0"
+  version: "1.1.0"
 
 standard:
   id: DJIM_SPDJI
   name: "Dow Jones Islamic Market Index"
   provider: "S&P Dow Jones Indices"
+  family: "Dow Jones Islamic Market"
+  series: "Broad Market"
 
 methodology:
-  title: "Dow Jones Islamic Market Indices Methodology"
-  version: "2026-02"
-  official_url: "https://www.spglobal.com/spdji/en/documents/methodologies/methodology-dj-islamic-market-indices.pdf"
-  verified_on: "2026-07-28"
+  rule_basis_edition: ed_2026_02
+  editions:
+    - id: ed_2026_02
+      label: "2026-02"
+      role: rule_basis
+      title: "Dow Jones Islamic Market Indices Methodology"
+      official_url:
+        value: "https://www.spglobal.com/spdji/en/documents/methodologies/methodology-dj-islamic-market-indices.pdf"
+        origin: inherited_from_tracked_rule_file
+        edition_specificity: unresolved
+        verification_status: unverified
+        provenance_ref: pv_official_url_unverified
+    - id: ed_2023_12
+      label: "2023-12"
+      role: historical_reference
+      title: "Dow Jones Islamic Market Indices Methodology"
+      official_url: null
 
 review:
   status: unreviewed
@@ -21,66 +45,944 @@ review:
   scope: null
   date: null
 
-business_activity_screen:
-  excluded_sectors:
-    - id: alcohol
-      label: "Alcohol"
-    - id: tobacco_ecigarettes
-      label: "Tobacco and electronic cigarettes"
-    - id: recreational_cannabis
-      label: "Recreational cannabis"
-    - id: pork_related
-      label: "Pork-related products"
-    - id: conventional_financial_services
-      label: "Conventional (non-Islamic) financial services"
-    - id: non_defense_weapons
-      label: "Weapons and related systems deployed for purposes other than defense, including spyware"
-    - id: gambling
-      label: "Gambling"
-    - id: adult_entertainment
-      label: "Adult entertainment"
-  tolerance_test:
-    id: djim_revenue_tolerance
-    label: "Non-permissible revenue tolerance"
-    description: >
-      Revenue tied to the excluded sectors above, plus all interest income
-      (operating and non-operating), tested against total revenue including
-      that interest income. The fact non_permissible_activity_revenue must
-      exclude all interest income, since interest income enters this ratio
-      separately through interest_income_operating and
-      interest_income_non_operating.
-    numerator:
-      facts: [non_permissible_activity_revenue, interest_income_operating, interest_income_non_operating]
-    denominator:
-      facts: [total_operating_revenue, interest_income_operating, interest_income_non_operating]
-    comparator: "<"
-    threshold: 0.05
-    evaluation_frequency: null
+source_evidence:
+  - id: se_2026_appendix_a_ratio
+    edition_ref: ed_2026_02
+    locator: "Appendix A, PDF 33 / printed 32"
+    scope: >-
+      Active accounting-based ratio screen, its ordinary threshold and
+      comparator, the transition band, both transition directions, the trailing
+      average denominator, and the dependence on an external classification.
+    verification_log_ref: "README.md#source-verification-log"
 
-ratio_screens:
-  - id: djim_leverage_compliance
-    label: "Leverage Compliance"
-    description: >
-      Total interest-bearing debt against a trailing 24-month average market
-      capitalization. This is DJIM's single remaining accounting screen -- the
-      former accounts-receivable screen (removed March 2023) and the former
-      cash-plus-interest-bearing-securities screen (removed September 2023) no
-      longer apply. Separately, DJIM publishes a dividend purification ratio,
-      which the methodology explicitly labels a purification aid and not a
-      compliance ratio; it is therefore deliberately not encoded as a screen
-      here.
-    numerator:
-      facts: [total_interest_bearing_debt]
-    denominator:
-      facts: [market_capitalization]
+  - id: se_2026_appendix_a_sectors
+    edition_ref: ed_2026_02
+    locator: "Appendix A, PDF 32 / printed 31"
+    scope: >-
+      Excluded business-activity categories in this edition, the weapons
+      deployment-purpose qualifier, the pork-selling nexus, the split of the
+      earlier entertainment category, and the revenue-tolerance denominator
+      label.
+    verification_log_ref: "README.md#source-verification-log"
+
+  - id: se_2026_appendix_e_change
+    edition_ref: ed_2026_02
+    locator: "Appendix E, PDF 40-41 / printed 39-40"
+    scope: >-
+      Methodology-change record replacing the former immediate re-entry route
+      with a three-consecutive-period return requirement.
+    verification_log_ref: "README.md#source-verification-log"
+
+  - id: se_2026_index_maintenance
+    edition_ref: ed_2026_02
+    locator: "Index Maintenance -- Broad-Market Indices, PDF 23 / printed 22"
+    scope: >-
+      Quarterly broad-market index composition review schedule. An index-review
+      schedule only, not a definition of a transition evaluation period.
+    verification_log_ref: "README.md#source-verification-log"
+
+  - id: se_2023_appendix_i_sectors
+    edition_ref: ed_2023_12
+    locator: "Appendix I, PDF 30 / printed 29"
+    scope: >-
+      Excluded business-activity categories in the earlier edition, the earlier
+      entertainment category, the earlier revenue-tolerance denominator label,
+      and an external classification code reference.
+    verification_log_ref: "README.md#source-verification-log"
+
+  - id: se_2023_appendix_i_ratio
+    edition_ref: ed_2023_12
+    locator: "Appendix I, PDF 31 / printed 30"
+    scope: >-
+      Trailing average market-capitalization denominator and a further external
+      classification code reference in the earlier edition.
+    verification_log_ref: "README.md#source-verification-log"
+
+  - id: se_2023_appendix_v_change
+    edition_ref: ed_2023_12
+    locator: "Appendix V, PDF 38-39 / printed 37-38"
+    scope: >-
+      Earlier-edition record of the same change entry replacing the immediate
+      re-entry route.
+    verification_log_ref: "README.md#source-verification-log"
+
+provenance:
+  # ---- Leverage screen -------------------------------------------------
+  - id: pv_leverage_threshold
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_ratio]
+    scope_limit: >-
+      The ordinary test compares the ratio strictly below the stated threshold.
+    open_decision_ref: null
+
+  - id: pv_active_ratio_count
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_ratio]
+    scope_limit: >-
+      Concerns the active accounting-based ratio screen only.
+    open_decision_ref: null
+
+  - id: pv_leverage_numerator_inherited
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    inherited_from_tracked_rule_file: true
+    scope_limit: >-
+      The leverage numerator is carried forward from tracked rule-file content.
+      The declared reviewed evidence set supplies no locator for its label or
+      definition, so it is not presented as source-established here.
+    open_decision_ref: null
+
+  - id: pv_transition_band
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_ratio]
+    scope_limit: >-
+      The band is stated separately from the ordinary limit.
+    open_decision_ref: null
+
+  - id: pv_c2n_within_band
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_ratio]
+    scope_limit: >-
+      Consecutiveness is established. The duration and scheduling of an
+      evaluation period are not.
+    open_decision_ref: null
+
+  - id: pv_c2n_immediate
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_ratio]
+    scope_limit: >-
+      An immediate route beyond the band is established for this direction.
+    open_decision_ref: null
+
+  - id: pv_n2c_requires
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_ratio]
+    scope_limit: >-
+      A single passing observation does not restore compliant status.
+    open_decision_ref: null
+
+  - id: pv_n2c_immediate_absent
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_e_change]
+    scope_limit: >-
+      Operational absence rests on the dated replacement recorded in the
+      non-operative methodology-change record, not on the absence of a
+      statement.
+    open_decision_ref: null
+
+  - id: pv_change_record_immediate_reentry
+    evidence_basis: [visual_observation, native_text_extraction, interpretation]
+    documentary_resolution: explicit
+    source_consistency:
+      state: inconsistent
+      scope: >-
+        The specific non-operative methodology-change record entry represented
+        in this rule file. The assessment does not extend to the complete
+        methodology change log.
+      note: >-
+        Retained three-ratio wording conflicts in cardinality with the two
+        ratio bullets listed in that same entry.
+    source_evidence_refs: [se_2026_appendix_e_change, se_2023_appendix_v_change]
+    scope_limit: >-
+      This entry must not be used alone to reconstruct the operative rule.
+    open_decision_ref: null
+
+  # ---- Leverage screen contextual claims -------------------------------
+  - id: pv_ctx_accounts_receivable_removal_inherited
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    inherited_from_tracked_rule_file: true
+    scope_limit: >-
+      The removal of an accounts-receivable screen in March 2023 is carried
+      forward from tracked rule-file content and is not established by the
+      declared reviewed evidence set.
+    open_decision_ref: null
+
+  - id: pv_ctx_cash_securities_removal_inherited
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    inherited_from_tracked_rule_file: true
+    scope_limit: >-
+      The removal of a cash-plus-interest-bearing-securities screen in
+      September 2023 is carried forward from tracked rule-file content and is
+      not established by the declared reviewed evidence set.
+    open_decision_ref: null
+
+  - id: pv_ctx_dividend_ratio_inherited
+    evidence_basis: [interpretation, synthesis]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    inherited_from_tracked_rule_file: true
+    scope_limit: >-
+      The characterization of the separately published dividend ratio as a
+      purification aid rather than a compliance ratio is carried forward from
+      tracked rule-file content and is not established by the declared
+      reviewed evidence set.
+    open_decision_ref: null
+
+  # ---- Cadences --------------------------------------------------------
+  - id: pv_review_cadence
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_index_maintenance]
+    scope_limit: >-
+      An index-composition review schedule. It is not a definition of a
+      transition evaluation period.
+    open_decision_ref: null
+
+  - id: pv_eval_period_unresolved
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      The declared reviewed evidence set does not establish the duration or the
+      scheduling of an evaluation period.
+    open_decision_ref: od_evaluation_period_duration
+
+  - id: pv_eval_review_mapping_unresolved
+    evidence_basis: [cross_version_comparison, interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      No provision in the declared reviewed evidence set maps one evaluation
+      period to one quarterly index review.
+    open_decision_ref: od_evaluation_review_mapping
+
+  # ---- Trailing average denominator -----------------------------------
+  - id: pv_window_24m
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_ratio, se_2023_appendix_i_ratio]
+    scope_limit: >-
+      The window length and the trailing-average form are established. The
+      observations taken within the window are not.
+    open_decision_ref: null
+
+  - id: pv_sampling_unresolved
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      The declared reviewed evidence set specifies no observation interval for
+      the trailing average.
+    open_decision_ref: od_sampling_interval
+
+  # ---- Edition metadata ------------------------------------------------
+  - id: pv_official_url_unverified
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      The edition specificity and the stability of the inherited URL are not
+      established. It is not an identifier of the methodology edition.
+    open_decision_ref: null
+
+  # ---- Revenue tolerance test ------------------------------------------
+  - id: pv_tolerance_threshold
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_sectors, se_2023_appendix_i_sectors]
+    scope_limit: >-
+      The five percent tolerance level only. This entry establishes no
+      comparator and no measurement basis for the denominator; those are
+      separate claims with their own provenance.
+    open_decision_ref: null
+
+  - id: pv_tolerance_comparator_inherited
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    inherited_from_tracked_rule_file: true
+    scope_limit: >-
+      The strict comparator on the revenue tolerance is carried forward from
+      tracked rule-file content and has no locator in the declared reviewed
+      evidence set.
+    open_decision_ref: null
+
+  - id: pv_tolerance_numerator_inherited
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    inherited_from_tracked_rule_file: true
+    scope_limit: >-
+      The three-part numerator composition is carried forward from tracked
+      rule-file content and has no locator in the declared reviewed evidence
+      set.
+    open_decision_ref: null
+
+  - id: pv_tolerance_denominator_inherited
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    inherited_from_tracked_rule_file: true
+    scope_limit: >-
+      The three-part denominator composition is carried forward from tracked
+      rule-file content. The declared reviewed evidence set establishes the
+      edition label of this denominator but not how it is composed.
+    open_decision_ref: null
+
+  - id: pv_denominator_label_2026
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_sectors]
+    scope_limit: >-
+      Records the edition-specific label only, so the two editions stay
+      distinguishable.
+    open_decision_ref: null
+
+  - id: pv_denominator_equivalence_unresolved
+    evidence_basis: [cross_version_comparison, interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_sectors, se_2023_appendix_i_sectors]
+    scope_limit: >-
+      The two editions establish a label difference. Neither mathematical
+      equivalence nor non-equivalence between the two labelled denominators is
+      established, so the labels are not aliased.
+    open_decision_ref: null
+
+  # ---- Business activities ---------------------------------------------
+  - id: pv_sector_inherited
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    inherited_from_tracked_rule_file: true
+    scope_limit: >-
+      This excluded activity is carried forward from tracked rule-file content.
+      The declared reviewed evidence set supplies no locator for it.
+    open_decision_ref: null
+
+  - id: pv_sector_categories_2026
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_sectors]
+    scope_limit: >-
+      Category presence in this edition. The operational classification effect
+      is not established.
+    open_decision_ref: null
+
+  - id: pv_weapons_qualifier
+    evidence_basis: [cross_version_comparison, visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_sectors, se_2023_appendix_i_sectors]
+    scope_limit: >-
+      The deployment-purpose qualifier and the named subcategory differ between
+      the editions. The reach of the qualifier and its proprietary application
+      remain unresolved.
+    open_decision_ref: null
+
+  - id: pv_pork_nexus
+    evidence_basis: [cross_version_comparison, visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_sectors, se_2023_appendix_i_sectors]
+    scope_limit: >-
+      An express relationship between specified establishment types and the
+      sale of pork became explicit between the editions.
+    open_decision_ref: null
+
+  - id: pv_pork_operational_effect_unresolved
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      The operational classification effect of the nexus is not established by
+      the declared reviewed evidence set.
+    open_decision_ref: null
+
+  - id: pv_entertainment_2023_category
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2023_appendix_i_sectors]
+    scope_limit: >-
+      Recorded as earlier-edition category content. It is not operative.
+    open_decision_ref: null
+
+  - id: pv_entertainment_split
+    evidence_basis: [cross_version_comparison, visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2023_appendix_i_sectors, se_2026_appendix_a_sectors]
+    scope_limit: >-
+      Establishes the split of one earlier category into two later categories.
+      The effective date of the change is not established.
+    open_decision_ref: null
+
+  - id: pv_hotel_eligibility_unresolved
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      Removal of hotels from the earlier wording does not establish general
+      hotel eligibility, and the declared reviewed evidence set settles no
+      eligibility consequence.
+    open_decision_ref: null
+
+  # ---- External classification -----------------------------------------
+  - id: pv_external_dependency
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_ratio, se_2023_appendix_i_sectors]
+    scope_limit: >-
+      The dependence on an external classification is established. Assignments
+      cannot be reproduced from methodology text, and the declared reviewed
+      evidence set prescribes no input shape or provider interface.
+    open_decision_ref: null
+
+  - id: pv_scheme_unresolved
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      The classification scheme is not identified in the declared reviewed
+      evidence set.
+    open_decision_ref: null
+
+  - id: pv_code_8000
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2023_appendix_i_sectors]
+    scope_limit: >-
+      Records the code as observed. No reproducible entity-to-code mapping is
+      available from methodology text.
+    open_decision_ref: null
+
+  - id: pv_code_8600
+    evidence_basis: [visual_observation, native_text_extraction]
+    documentary_resolution: explicit
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    source_evidence_refs: [se_2026_appendix_a_ratio, se_2023_appendix_i_ratio]
+    scope_limit: >-
+      Records the code as observed. Neither a reproducible entity-to-code
+      mapping nor sufficient conditional facts are available from methodology
+      text.
+    open_decision_ref: null
+
+  - id: pv_value_space_unresolved
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      Observed codes are recorded without establishing the value space, its
+      closure, mutual exclusivity, or any hierarchy.
+    open_decision_ref: null
+
+  - id: pv_cardinality_unresolved
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      The number of relevant assignments per entity is not established by the
+      declared reviewed evidence set.
+    open_decision_ref: null
+
+  - id: pv_conditional_conditions_unresolved
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      The conditions of the eligibility test are not transcribed in the
+      declared reviewed evidence set, so no clause is encoded.
+    open_decision_ref: od_conditional_eligibility_clauses
+
+  - id: pv_conditional_scope_unresolved
+    evidence_basis: [interpretation]
+    documentary_resolution: unresolved
+    source_consistency: { state: not_assessed, scope: null, note: null }
+    scope_limit: >-
+      Which excluded activity the external classification codes qualify is not
+      established by the declared reviewed evidence set.
+    open_decision_ref: od_conditional_eligibility_clauses
+
+open_decisions:
+  - id: od_evaluation_period_duration
+    question: "Duration and scheduling of an evaluation period."
+    resolution_paths: ["obtain_authoritative_definition"]
+    status: open
+    decided_on: null
+
+  - id: od_evaluation_review_mapping
+    question: "Whether one evaluation period maps to one quarterly index review."
+    resolution_paths: ["obtain_authoritative_definition"]
+    status: open
+    decided_on: null
+
+  - id: od_sampling_interval
+    question: "Observation interval used to construct the trailing 24-month average."
+    resolution_paths:
+      - "obtain_authoritative_definition"
+      - "make_and_disclose_a_separately_reviewed_implementation_decision"
+    status: open
+    decided_on: null
+
+  - id: od_missing_input_policy
+    question: "Engine behaviour when a required input is absent from the fact snapshot."
+    resolution_paths: ["engine_layer_design_decision"]
+    status: open
+    decided_on: null
+
+  - id: od_classification_delivery_channel
+    question: "Delivery channel through which external classification assignments reach the engine."
+    resolution_paths: ["project_interface_design_decision"]
+    status: open
+    decided_on: null
+
+  - id: od_adapter_assignment_shape
+    question: "Adapter-contract shape for externally supplied classification assignments."
+    resolution_paths: ["adapter_contract_design_decision"]
+    status: open
+    decided_on: null
+
+  - id: od_conditional_eligibility_clauses
+    question: >-
+      Page-referenced conditions of the external-classification eligibility
+      test, and which excluded activity it qualifies.
+    resolution_paths: ["obtain_page_referenced_extraction"]
+    status: open
+    decided_on: null
+
+required_inputs:
+  - id: in_total_interest_bearing_debt
+    kind: entity_financial_fact
+    description: "Interest-bearing debt, period-end balance."
+    data_origin:
+      semantic_source: issuer_financial_data
+      supplied_via: adapter
+    absence:
+      representable: true
+      open_decision_ref: od_missing_input_policy
+    provenance_ref: pv_leverage_numerator_inherited
+
+  - id: in_market_capitalization
+    kind: entity_market_observation
+    description: >-
+      Market capitalization observations. Not derivable from issuer filings,
+      which carry share counts but no prices.
+    data_origin:
+      semantic_source: market_observation
+      supplied_via: caller
+    absence:
+      representable: true
+      open_decision_ref: od_missing_input_policy
+    provenance_ref: pv_window_24m
+
+  - id: in_non_permissible_activity_revenue
+    kind: entity_financial_fact
+    description: >-
+      Revenue attributable to the excluded activities, net of all interest
+      income. Interest income enters the tolerance ratio through its own two
+      inputs and must not be counted twice.
+    data_origin:
+      semantic_source: issuer_financial_data
+      supplied_via: adapter
+    absence:
+      representable: true
+      open_decision_ref: od_missing_input_policy
+    provenance_ref: pv_tolerance_numerator_inherited
+
+  - id: in_interest_income_operating
+    kind: entity_financial_fact
+    description: "Interest income, operating."
+    data_origin:
+      semantic_source: issuer_financial_data
+      supplied_via: adapter
+    absence:
+      representable: true
+      open_decision_ref: od_missing_input_policy
+    provenance_ref: pv_tolerance_numerator_inherited
+
+  - id: in_interest_income_non_operating
+    kind: entity_financial_fact
+    description: "Interest income, non-operating."
+    data_origin:
+      semantic_source: issuer_financial_data
+      supplied_via: adapter
+    absence:
+      representable: true
+      open_decision_ref: od_missing_input_policy
+    provenance_ref: pv_tolerance_numerator_inherited
+
+  - id: in_total_operating_revenue
+    kind: entity_financial_fact
+    description: "Total revenue excluding interest income."
+    data_origin:
+      semantic_source: issuer_financial_data
+      supplied_via: adapter
+    absence:
+      representable: true
+      open_decision_ref: od_missing_input_policy
+    provenance_ref: pv_tolerance_denominator_inherited
+
+  - id: in_prior_period_status
+    kind: engine_state
+    description: "Status assigned in the previous evaluation period."
+    data_origin:
+      semantic_source: engine_prior_state
+      supplied_via: internal
+    absence:
+      representable: true
+      open_decision_ref: od_missing_input_policy
+    provenance_ref: pv_c2n_within_band
+
+  - id: in_consecutive_failing_periods
+    kind: engine_state
+    description: >-
+      Count of consecutive evaluation periods in which the ratio failed the
+      ordinary test while inside the band.
+    data_origin:
+      semantic_source: engine_prior_state
+      supplied_via: internal
+    absence:
+      representable: true
+      open_decision_ref: od_missing_input_policy
+    provenance_ref: pv_c2n_within_band
+
+  - id: in_consecutive_passing_periods
+    kind: engine_state
+    description: >-
+      Count of consecutive evaluation periods in which the ratio satisfied the
+      ordinary test.
+    data_origin:
+      semantic_source: engine_prior_state
+      supplied_via: internal
+    absence:
+      representable: true
+      open_decision_ref: od_missing_input_policy
+    provenance_ref: pv_n2c_requires
+
+  - id: in_classification_assignment
+    kind: external_classification_assignment
+    description: >-
+      Externally assigned classification for the entity being screened. The
+      scheme, the value space and the number of relevant assignments are all
+      unresolved, and no assignment can be reproduced from methodology text.
+    data_origin:
+      semantic_source: proprietary_external
+      supplied_via: unresolved
+      open_decision_ref: od_classification_delivery_channel
+    absence:
+      representable: true
+      open_decision_ref: od_missing_input_policy
+    provenance_ref: pv_external_dependency
+    assignment_subject: entity
+    scheme:
+      identifier: null
+      provenance_ref: pv_scheme_unresolved
+    observed_codes:
+      exhaustive: false
+      exhaustiveness_provenance_ref: pv_value_space_unresolved
+      values:
+        - code: "8000"
+          provenance_ref: pv_code_8000
+        - code: "8600"
+          provenance_ref: pv_code_8600
+    documentary_cardinality:
+      status: unresolved
+      provenance_ref: pv_cardinality_unresolved
+    adapter_contract:
+      assignment_shape: open
+      open_decision_ref: od_adapter_assignment_shape
+
+operands:
+  - id: op_interest_bearing_debt
+    label: "Interest-bearing debt"
+    computation:
+      input_refs: [in_total_interest_bearing_debt]
+      combination: sum
+    documentary_labels: null
+    documentary_definitions: null
+    documentary_basis_provenance_ref: pv_leverage_numerator_inherited
+    equivalence_across_editions: null
+
+  - id: op_avg_market_cap_24m
+    label: "Trailing 24-month average market capitalization"
+    computation:
+      input_refs: [in_market_capitalization]
+      combination: sum
       averaging_window:
         unit: months
         length: 24
         method: trailing_average
+        provenance_ref: pv_window_24m
+        sampling:
+          interval: null
+          provenance_ref: pv_sampling_unresolved
+          open_decision_ref: od_sampling_interval
+    documentary_labels: null
+    documentary_definitions:
+      - edition_ref: ed_2026_02
+        summary: >-
+          Market capitalization averaged over the trailing twenty-four months.
+        provenance_ref: pv_window_24m
+    documentary_basis_provenance_ref: pv_window_24m
+    equivalence_across_editions: null
+
+  - id: op_non_permissible_revenue
+    label: "Non-permissible revenue including all interest income"
+    computation:
+      input_refs:
+        - in_non_permissible_activity_revenue
+        - in_interest_income_operating
+        - in_interest_income_non_operating
+      combination: sum
+    documentary_labels: null
+    documentary_definitions: null
+    documentary_basis_provenance_ref: pv_tolerance_numerator_inherited
+    equivalence_across_editions: null
+
+  - id: op_total_business_revenue
+    label: "Total business revenue including all interest income"
+    computation:
+      input_refs:
+        - in_total_operating_revenue
+        - in_interest_income_operating
+        - in_interest_income_non_operating
+      combination: sum
+    documentary_labels:
+      - edition_ref: ed_2026_02
+        text: "Total Business Revenue"
+        provenance_ref: pv_denominator_label_2026
+    documentary_definitions: null
+    documentary_basis_provenance_ref: pv_tolerance_denominator_inherited
+    equivalence_across_editions:
+      - edition_a: ed_2023_12
+        edition_a_label: "Total Revenue"
+        edition_b: ed_2026_02
+        edition_b_label: "Total Business Revenue"
+        status: not_established
+        provenance_ref: pv_denominator_equivalence_unresolved
+
+cadences:
+  index_review:
+    id: cad_broad_market_review
+    applies_to: index_composition
+    frequency: quarterly
+    months: [3, 6, 9, 12]
+    provenance_ref: pv_review_cadence
+  evaluation_period:
+    id: per_evaluation
+    duration: null
+    schedule: null
+    provenance_ref: pv_eval_period_unresolved
+    open_decision_ref: od_evaluation_period_duration
+    mapping_to_index_review:
+      status: not_established
+      provenance_ref: pv_eval_review_mapping_unresolved
+      open_decision_ref: od_evaluation_review_mapping
+
+business_activity_screen:
+  excluded_activities:
+    - id: act_alcohol
+      label: "Alcohol"
+      edition_ref: ed_2026_02
+      provenance_ref: pv_sector_inherited
+
+    - id: act_tobacco_ecigarettes
+      label: "Tobacco and electronic cigarettes"
+      edition_ref: ed_2026_02
+      provenance_ref: pv_sector_inherited
+
+    - id: act_recreational_cannabis
+      label: "Recreational cannabis"
+      edition_ref: ed_2026_02
+      provenance_ref: pv_sector_inherited
+
+    - id: act_conventional_financial_services
+      label: "Conventional (non-Islamic) financial services"
+      edition_ref: ed_2026_02
+      provenance_ref: pv_sector_inherited
+
+    - id: act_pork_related
+      label: "Pork-related products"
+      edition_ref: ed_2026_02
+      provenance_ref: pv_sector_categories_2026
+      nexus_relations:
+        - relation: activity_by_entity_type
+          entity_role: "specified establishment types"
+          activity: "sale of pork"
+          provenance_ref: pv_pork_nexus
+          operational_effect:
+            status: unresolved
+            provenance_ref: pv_pork_operational_effect_unresolved
+
+    - id: act_weapons_non_defense
+      label: "Weapons and related systems"
+      edition_ref: ed_2026_02
+      provenance_ref: pv_sector_categories_2026
+      qualifiers:
+        - kind: deployment_purpose
+          summary: >-
+            Excluded where deployed for purposes other than defense.
+          provenance_ref: pv_weapons_qualifier
+      subcategories:
+        - id: sub_spyware
+          label: "Spyware"
+          provenance_ref: pv_weapons_qualifier
+
+    - id: act_gambling
+      label: "Gambling"
+      edition_ref: ed_2026_02
+      provenance_ref: pv_sector_categories_2026
+
+    - id: act_adult_entertainment
+      label: "Adult entertainment"
+      edition_ref: ed_2026_02
+      provenance_ref: pv_sector_categories_2026
+
+  historical_activities:
+    - id: act_entertainment_2023
+      label: "Entertainment"
+      edition_ref: ed_2023_12
+      normative_use: not_operative
+      provenance_ref: pv_entertainment_2023_category
+
+  category_mappings:
+    - id: map_entertainment_split
+      relation: split
+      from:
+        edition_ref: ed_2023_12
+        activity_ref: act_entertainment_2023
+      to:
+        - edition_ref: ed_2026_02
+          activity_ref: act_gambling
+        - edition_ref: ed_2026_02
+          activity_ref: act_adult_entertainment
+      provenance_ref: pv_entertainment_split
+      consequence:
+        summary: >-
+          Removal of hotels from the earlier wording does not establish general
+          hotel eligibility.
+        provenance_ref: pv_hotel_eligibility_unresolved
+
+  conditional_eligibility:
+    - id: cond_external_code_exception
+      effect: overrides_exclusion
+      applies_to_activity_ref: null
+      applies_to_provenance_ref: pv_conditional_scope_unresolved
+      depends_on_inputs: [in_classification_assignment]
+      condition_specification:
+        completeness: incomplete
+        logic: null
+        clauses: null
+        provenance_ref: pv_conditional_conditions_unresolved
+      open_decision_ref: od_conditional_eligibility_clauses
+
+  tolerance_tests:
+    - id: scr_djim_revenue_tolerance
+      label: "Non-permissible revenue tolerance"
+      description: >-
+        Revenue tied to the excluded activities, plus all interest income
+        (operating and non-operating), tested against total business revenue
+        including that same interest income. The numerator and denominator
+        compositions and the strict comparator are carried forward from tracked
+        rule-file content; the declared reviewed evidence set supplies no
+        locator for them. That evidence set does establish the five percent
+        level and the edition label of the denominator.
+      numerator_ref: op_non_permissible_revenue
+      denominator_ref: op_total_business_revenue
+      comparator: "<"
+      comparator_provenance_ref: pv_tolerance_comparator_inherited
+      threshold: 0.05
+      threshold_provenance_ref: pv_tolerance_threshold
+
+ratio_screens:
+  - id: scr_djim_leverage
+    label: "Leverage Compliance"
+    description: >-
+      Interest-bearing debt measured against a trailing 24-month average market
+      capitalization. The declared reviewed evidence set establishes this as
+      the single active accounting-based ratio screen.
+    numerator_ref: op_interest_bearing_debt
+    denominator_ref: op_avg_market_cap_24m
     comparator: "<"
+    comparator_provenance_ref: pv_leverage_threshold
     threshold: 0.33
-    evaluation_frequency: null
-    transition_buffer:
-      tolerance_band: 0.02
-      consecutive_periods_before_flip: 3
-      immediate_breach_beyond_band: true
+    threshold_provenance_ref: pv_leverage_threshold
+    active_ratio_count_provenance_ref: pv_active_ratio_count
+    contextual_claims:
+      - id: ctx_accounts_receivable_screen_removed
+        summary: >-
+          An accounts-receivable screen was removed in March 2023.
+        provenance_ref: pv_ctx_accounts_receivable_removal_inherited
+      - id: ctx_cash_securities_screen_removed
+        summary: >-
+          A cash-plus-interest-bearing-securities screen was removed in
+          September 2023.
+        provenance_ref: pv_ctx_cash_securities_removal_inherited
+      - id: ctx_dividend_ratio_is_purification_aid
+        summary: >-
+          The separately published dividend ratio is a purification aid rather
+          than a compliance ratio.
+        provenance_ref: pv_ctx_dividend_ratio_inherited
+    status_transitions:
+      state_input_ref: in_prior_period_status
+      from_compliant_to_non_compliant:
+        tolerance_band:
+          width: 0.02
+          unit: same_as_threshold
+          provenance_ref: pv_transition_band
+        within_band:
+          status_retained: true
+          trigger:
+            counter_input_ref: in_consecutive_failing_periods
+            required_consecutive_periods: 3
+            period_ref: per_evaluation
+          provenance_ref: pv_c2n_within_band
+        beyond_band:
+          immediate_transition:
+            availability: present
+            provenance_ref: pv_c2n_immediate
+      from_non_compliant_to_compliant:
+        requires:
+          test: ordinary_threshold
+          counter_input_ref: in_consecutive_passing_periods
+          required_consecutive_periods: 3
+          period_ref: per_evaluation
+          provenance_ref: pv_n2c_requires
+        immediate_transition:
+          availability: absent
+          absence_basis: superseded
+          superseded_by_change_ref: chg_immediate_reentry_replaced
+          provenance_ref: pv_n2c_immediate_absent
+
+methodology_change_record:
+  - id: chg_immediate_reentry_replaced
+    normative_use: not_operative
+    effective_date: "2023-09-15"
+    effective_moment: after_close
+    replaced: "immediate re-entry route to compliant status"
+    replaced_by: "return requiring three consecutive passing evaluation periods"
+    source_editions: [ed_2023_12, ed_2026_02]
+    provenance_ref: pv_change_record_immediate_reentry
+    scope_limit: >-
+      Historical record only. It is never executable as an active route, and
+      the recorded inconsistency applies to this entry alone rather than to the
+      complete methodology change log.
+
+purification_methods: []

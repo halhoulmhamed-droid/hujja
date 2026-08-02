@@ -2,29 +2,106 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://hujja.dev/schemas/rule-file.schema.json",
   "title": "Hujja Rule File",
-  "description": "Declarative rule file for one Shariah screening standard. Encodes facts (thresholds, comparators, provenance) only -- no engine logic.",
+  "description": "Declarative rule file for one Shariah screening standard. Encodes facts, thresholds, comparators and documentary provenance only -- never engine logic and never a verdict policy. Documentary resolution is stated against the declared reviewed evidence set for this rule file, not against every document that may exist.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "rule_file", "standard", "methodology", "review", "ratio_screens"],
+  "required": [
+    "schema_version",
+    "rule_file",
+    "standard",
+    "methodology",
+    "review",
+    "source_evidence",
+    "provenance",
+    "open_decisions",
+    "required_inputs",
+    "operands",
+    "cadences",
+    "ratio_screens"
+  ],
   "properties": {
     "schema_version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "Version of this rule-file FORMAT, not the methodology or this file's own content."
+      "const": "2.0.0",
+      "description": "Version of this rule-file FORMAT, not the methodology and not this file's own content. This schema document is format version 2.0.0 and validates only 2.0.0 rule files."
     },
-    "rule_file": {
+    "rule_file": { "$ref": "#/$defs/ruleFile" },
+    "standard": { "$ref": "#/$defs/standard" },
+    "methodology": { "$ref": "#/$defs/methodology" },
+    "review": { "$ref": "#/$defs/review" },
+    "source_evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/sourceEvidence" },
+      "description": "Public evidence registry. Every entry is an official edition plus a section/page locator that a bare clone can act on."
+    },
+    "provenance": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/provenance" },
+      "description": "Claim-level documentary metadata. Referenced by *_provenance_ref and provenance_ref fields throughout the file."
+    },
+    "open_decisions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/openDecision" },
+      "description": "Hujja implementation choices that are not yet made. Never a documentary value and never an engine default."
+    },
+    "required_inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/requiredInput" },
+      "description": "Runtime data the engine needs. The ONLY place a data_origin object may appear."
+    },
+    "operands": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/operand" }
+    },
+    "cadences": { "$ref": "#/$defs/cadences" },
+    "business_activity_screen": { "$ref": "#/$defs/businessActivityScreen" },
+    "ratio_screens": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/ratioScreen" }
+    },
+    "methodology_change_record": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/methodologyChangeRecord" },
+      "description": "Historical records only. Every entry is non-operative and may be reached from an active rule solely through an explicit supersession reference."
+    },
+    "purification_methods": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/purificationMethod" },
+      "description": "Plural by construction so distinct purification methods can never be merged into one object. An empty array records that no method is encoded."
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "nullableIdentifier": {
+      "type": ["string", "null"],
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+
+    "ruleFile": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "version"],
       "properties": {
-        "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "id": { "$ref": "#/$defs/identifier" },
         "version": {
-          "type": "string",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$",
-          "description": "Semver of this rule file's content. Bump on every change per the rule-change checklist."
+          "$ref": "#/$defs/semver",
+          "description": "Semver of this rule file's CONTENT. Bump on every change per the rule-change checklist. Format compatibility is versioned by schema_version instead."
         }
       }
     },
+
     "standard": {
       "type": "object",
       "additionalProperties": false,
@@ -33,151 +110,1126 @@
         "id": {
           "type": "string",
           "pattern": "^[A-Z][A-Z0-9_]*$",
-          "description": "Canonical machine identifier, e.g. DJIM_SPDJI. Matches Engine(standards=[...])."
+          "description": "Canonical machine identifier, e.g. DJIM_SPDJI. Exactly one standard per rule file -- there is no container for two."
         },
         "name": { "type": "string", "minLength": 1 },
-        "provider": { "type": "string", "minLength": 1 }
+        "provider": { "type": "string", "minLength": 1 },
+        "family": { "type": "string", "minLength": 1 },
+        "series": { "type": "string", "minLength": 1 }
       }
     },
+
     "methodology": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["title", "version", "official_url", "verified_on"],
+      "required": ["rule_basis_edition", "editions"],
       "properties": {
-        "title": { "type": "string", "minLength": 1 },
-        "version": {
-          "type": "string",
-          "minLength": 1,
-          "description": "The methodology document's own edition label, e.g. \"2026-02\"."
+        "rule_basis_edition": {
+          "$ref": "#/$defs/identifier",
+          "description": "The edition this rule file applies. It does NOT assert that the edition is the latest currently published."
         },
-        "official_url": { "type": "string", "format": "uri" },
-        "verified_on": {
-          "type": "string",
-          "format": "date",
-          "description": "Date a human or session read the primary source in full."
+        "editions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/edition" }
         }
       }
     },
-    "review": { "$ref": "#/$defs/review" },
-    "business_activity_screen": {
+
+    "edition": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["excluded_sectors", "tolerance_test"],
+      "required": ["id", "label", "role", "title", "official_url"],
       "properties": {
-        "excluded_sectors": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["id", "label"],
-            "properties": {
-              "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
-              "label": { "type": "string", "minLength": 1 }
-            }
-          }
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The standard-setter's own edition label, e.g. \"2026-02\". Never a Hujja semantic version."
         },
-        "tolerance_test": { "$ref": "#/$defs/ratioScreen" }
+        "role": { "enum": ["rule_basis", "historical_reference"] },
+        "title": { "type": "string", "minLength": 1 },
+        "official_url": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/inheritedUrl" }
+          ],
+          "description": "Edition identity never depends on a URL. A URL may be carried only as inherited tracked content with its limits stated."
+        }
       }
     },
-    "ratio_screens": {
-      "type": "array",
-      "minItems": 1,
-      "items": { "$ref": "#/$defs/ratioScreen" }
-    }
-  },
-  "$defs": {
+
+    "inheritedUrl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "origin", "edition_specificity", "verification_status", "provenance_ref"],
+      "properties": {
+        "value": { "type": "string", "format": "uri" },
+        "origin": { "const": "inherited_from_tracked_rule_file" },
+        "edition_specificity": { "const": "unresolved" },
+        "verification_status": { "const": "unverified" },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
     "review": {
       "type": "object",
       "additionalProperties": false,
       "required": ["status", "reviewer", "scope", "date"],
       "properties": {
-        "status": { "type": "string", "enum": ["unreviewed", "expert_reviewed"] },
+        "status": { "enum": ["unreviewed", "expert_reviewed"] },
         "reviewer": { "type": ["string", "null"], "description": "Named only with the reviewer's written consent." },
-        "scope": { "type": ["string", "null"], "description": "What was checked, e.g. \"rule file v1.0.0 checked against official source\"." },
+        "scope": { "type": ["string", "null"] },
         "date": { "type": ["string", "null"], "format": "date" }
       },
       "allOf": [
         {
-          "if": { "properties": { "status": { "const": "expert_reviewed" } } },
+          "if": {
+            "properties": { "status": { "const": "expert_reviewed" } },
+            "required": ["status"]
+          },
           "then": {
             "properties": {
               "reviewer": { "type": "string", "minLength": 1 },
               "scope": { "type": "string", "minLength": 1 },
-              "date": { "type": "string", "format": "date" }
+              "date": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                "description": "A real calendar date. The pattern fixes the lexical shape; `format: date` rejects impossible dates such as 2026-02-31, so a validator must be constructed with a format checker."
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "unreviewed" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "reviewer": { "type": "null" },
+              "scope": { "type": "null" },
+              "date": { "type": "null" }
             }
           }
         }
       ]
     },
-    "factExpression": {
+
+    "sourceEvidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["facts"],
+      "required": ["id", "edition_ref", "locator", "scope", "verification_log_ref"],
       "properties": {
-        "facts": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "edition_ref": { "$ref": "#/$defs/identifier" },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Official section and page locator inside the referenced edition."
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What this locator is offered as evidence for. Hujja's own paraphrase."
+        },
+        "verification_log_ref": {
+          "const": "README.md#source-verification-log",
+          "description": "The stable public boundary. A bare clone resolves this anchor."
+        }
+      }
+    },
+
+    "sourceConsistency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "scope"],
+      "properties": {
+        "state": {
+          "enum": ["not_assessed", "consistent", "inconsistent", "not_applicable"],
+          "description": "Coherence of the source material a claim rests on. A sibling of documentary_resolution, never derived from it: a claim may be explicit and inconsistent at once."
+        },
+        "scope": { "type": ["string", "null"] },
+        "note": { "type": ["string", "null"] }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "state": { "const": "inconsistent" } },
+            "required": ["state"]
+          },
+          "then": {
+            "properties": { "scope": { "type": "string", "minLength": 1 } }
+          }
+        }
+      ]
+    },
+
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "evidence_basis", "documentary_resolution", "source_consistency"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "evidence_basis": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
-          "description": "Fact IDs from the fact model. If more than one, they are summed."
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "visual_observation",
+              "native_text_extraction",
+              "cross_version_comparison",
+              "interpretation",
+              "synthesis"
+            ]
+          },
+          "description": "How the documentary conclusion was produced. Multi-valued, and it never determines documentary_resolution."
         },
-        "averaging_window": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["unit", "length", "method"],
-          "properties": {
-            "unit": { "type": "string", "enum": ["months"] },
-            "length": { "type": "integer", "minimum": 1 },
-            "method": { "type": "string", "enum": ["trailing_average"] }
+        "documentary_resolution": {
+          "enum": ["explicit", "partially_supported", "unresolved", "not_found_after_targeted_review"],
+          "description": "What the DECLARED REVIEWED EVIDENCE SET establishes. Absence of a locator means that evidence set does not establish the claim -- not that every possible source is silent. Implementation-choice values are prohibited here."
+        },
+        "source_consistency": { "$ref": "#/$defs/sourceConsistency" },
+        "source_evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "supported_scope": { "type": ["string", "null"] },
+        "unresolved_scope": { "type": ["string", "null"] },
+        "inherited_from_tracked_rule_file": {
+          "type": "boolean",
+          "description": "True when the claim carries forward tracked rule-file content for which the declared reviewed evidence set provides no locator."
+        },
+        "scope_limit": { "type": ["string", "null"] },
+        "open_decision_ref": { "$ref": "#/$defs/nullableIdentifier" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "documentary_resolution": { "const": "explicit" } },
+            "required": ["documentary_resolution"]
+          },
+          "then": {
+            "required": ["source_evidence_refs"],
+            "properties": { "source_evidence_refs": { "minItems": 1 } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "documentary_resolution": { "const": "partially_supported" } },
+            "required": ["documentary_resolution"]
+          },
+          "then": {
+            "required": ["source_evidence_refs", "supported_scope", "unresolved_scope"],
+            "properties": {
+              "source_evidence_refs": { "minItems": 1 },
+              "supported_scope": { "type": "string", "minLength": 1 },
+              "unresolved_scope": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "inherited_from_tracked_rule_file": { "const": true } },
+            "required": ["inherited_from_tracked_rule_file"]
+          },
+          "then": {
+            "required": ["scope_limit"],
+            "properties": { "documentary_resolution": { "const": "unresolved" } }
+          }
+        }
+      ]
+    },
+
+    "openDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "question", "resolution_paths", "status", "decided_on"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "question": { "type": "string", "minLength": 1 },
+        "resolution_paths": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "status": { "enum": ["open", "resolved"] },
+        "decided_on": { "type": ["string", "null"], "format": "date" }
+      }
+    },
+
+    "dataOrigin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semantic_source", "supplied_via"],
+      "properties": {
+        "semantic_source": {
+          "enum": ["issuer_financial_data", "market_observation", "proprietary_external", "engine_prior_state", "unresolved"],
+          "description": "Substantive origin of a runtime datum. Methodology constants are not runtime data and are justified by provenance instead."
+        },
+        "supplied_via": {
+          "enum": ["caller", "adapter", "internal", "unresolved"],
+          "description": "Delivery channel. Independent of semantic_source -- neither is derivable from the other."
+        },
+        "open_decision_ref": { "$ref": "#/$defs/identifier" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "supplied_via": { "const": "unresolved" } },
+            "required": ["supplied_via"]
+          },
+          "then": { "required": ["open_decision_ref"] }
+        }
+      ]
+    },
+
+    "absence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["representable"],
+      "properties": {
+        "representable": {
+          "const": true,
+          "description": "Records only that a fact snapshot can express this input's absence. It never states what the engine does about it."
+        },
+        "open_decision_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "classificationScheme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier", "provenance_ref"],
+      "properties": {
+        "identifier": { "type": ["string", "null"] },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "observedCodes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exhaustive", "exhaustiveness_provenance_ref", "values"],
+      "properties": {
+        "exhaustive": { "type": "boolean" },
+        "exhaustiveness_provenance_ref": { "$ref": "#/$defs/identifier" },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "provenance_ref"],
+            "properties": {
+              "code": { "type": "string", "minLength": 1 },
+              "provenance_ref": { "$ref": "#/$defs/identifier" }
+            }
           }
         }
       }
     },
-    "transitionBuffer": {
+
+    "documentaryCardinality": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["tolerance_band", "consecutive_periods_before_flip", "immediate_breach_beyond_band"],
+      "required": ["status", "provenance_ref"],
       "properties": {
-        "tolerance_band": {
-          "type": "number",
-          "exclusiveMinimum": 0,
-          "maximum": 1,
-          "description": "Width of the buffer band, expressed as a fraction in the SAME unit as `threshold`. 0.02 means 2 percentage points; with threshold 0.33 the buffer ceiling is 0.35."
+        "status": {
+          "enum": ["established", "unresolved"],
+          "description": "How many relevant assignments exist per entity, as established by the declared reviewed evidence set. Distinct from any future adapter-contract shape."
         },
-        "consecutive_periods_before_flip": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Number of consecutive evaluation periods over the threshold, while inside the band, before the status flips. The length of a period is `evaluation_frequency` on the same screen."
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "adapterContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assignment_shape", "open_decision_ref"],
+      "properties": {
+        "assignment_shape": {
+          "enum": ["open"],
+          "description": "The future adapter-contract shape. 'open' records that no shape has been chosen."
         },
-        "immediate_breach_beyond_band": {
-          "type": "boolean",
-          "description": "If true, a ratio beyond threshold + tolerance_band flips the status immediately, without waiting for consecutive_periods_before_flip."
+        "open_decision_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "requiredInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "description", "data_origin", "absence", "provenance_ref"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "kind": {
+          "enum": [
+            "entity_financial_fact",
+            "entity_market_observation",
+            "engine_state",
+            "external_classification_assignment"
+          ]
+        },
+        "description": { "type": "string", "minLength": 1 },
+        "data_origin": { "$ref": "#/$defs/dataOrigin" },
+        "absence": { "$ref": "#/$defs/absence" },
+        "provenance_ref": { "$ref": "#/$defs/identifier" },
+        "assignment_subject": {
+          "enum": ["entity"],
+          "description": "The subject an assignment attaches to. Kept distinct from the scheme, the assignment and the code."
+        },
+        "scheme": { "$ref": "#/$defs/classificationScheme" },
+        "observed_codes": { "$ref": "#/$defs/observedCodes" },
+        "documentary_cardinality": { "$ref": "#/$defs/documentaryCardinality" },
+        "adapter_contract": { "$ref": "#/$defs/adapterContract" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "const": "external_classification_assignment" } },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": ["assignment_subject", "scheme", "observed_codes", "documentary_cardinality", "adapter_contract"]
+          },
+          "else": {
+            "allOf": [
+              { "not": { "required": ["assignment_subject"] } },
+              { "not": { "required": ["scheme"] } },
+              { "not": { "required": ["observed_codes"] } },
+              { "not": { "required": ["documentary_cardinality"] } },
+              { "not": { "required": ["adapter_contract"] } }
+            ]
+          }
+        }
+      ]
+    },
+
+    "documentaryLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["edition_ref", "text", "provenance_ref"],
+      "properties": {
+        "edition_ref": { "$ref": "#/$defs/identifier" },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A short edition-specific term of art, recorded only to keep editions distinguishable. Explanatory prose is paraphrased, never reproduced."
+        },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "documentaryDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["edition_ref", "summary", "provenance_ref"],
+      "properties": {
+        "edition_ref": { "$ref": "#/$defs/identifier" },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Hujja's own paraphrase. Never text copied from the standard."
+        },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "equivalenceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["edition_a", "edition_a_label", "edition_b", "edition_b_label", "status", "provenance_ref"],
+      "properties": {
+        "edition_a": { "$ref": "#/$defs/identifier" },
+        "edition_a_label": { "type": "string", "minLength": 1 },
+        "edition_b": { "$ref": "#/$defs/identifier" },
+        "edition_b_label": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["established", "not_established"] },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "sampling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interval", "provenance_ref"],
+      "properties": {
+        "interval": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["unit", "length"],
+              "properties": {
+                "unit": { "enum": ["days", "weeks", "months"] },
+                "length": { "type": "integer", "minimum": 1 }
+              }
+            }
+          ],
+          "description": "Observation interval used to build the average. null means the declared reviewed evidence set does not establish it."
+        },
+        "provenance_ref": { "$ref": "#/$defs/identifier" },
+        "open_decision_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "averagingWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "length", "method", "provenance_ref", "sampling"],
+      "properties": {
+        "unit": { "enum": ["months"] },
+        "length": { "type": "integer", "minimum": 1 },
+        "method": { "enum": ["trailing_average"] },
+        "provenance_ref": { "$ref": "#/$defs/identifier" },
+        "sampling": { "$ref": "#/$defs/sampling" }
+      }
+    },
+
+    "operand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "computation",
+        "documentary_labels",
+        "documentary_definitions",
+        "documentary_basis_provenance_ref",
+        "equivalence_across_editions"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": { "type": "string", "minLength": 1 },
+        "computation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["input_refs", "combination"],
+          "properties": {
+            "input_refs": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/identifier" }
+            },
+            "combination": {
+              "const": "sum",
+              "description": "The only expressible arithmetic. No other operation has a verified basis."
+            },
+            "averaging_window": { "$ref": "#/$defs/averagingWindow" }
+          }
+        },
+        "documentary_labels": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/documentaryLabel" } }
+          ],
+          "description": "null means the declared reviewed evidence set supplies no edition-specific label."
+        },
+        "documentary_definitions": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/documentaryDefinition" } }
+          ]
+        },
+        "documentary_basis_provenance_ref": { "$ref": "#/$defs/identifier" },
+        "equivalence_across_editions": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/equivalenceRecord" } }
+          ]
         }
       }
     },
+
+    "cadences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index_review", "evaluation_period"],
+      "properties": {
+        "index_review": { "$ref": "#/$defs/indexReview" },
+        "evaluation_period": { "$ref": "#/$defs/evaluationPeriod" }
+      }
+    },
+
+    "indexReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "applies_to", "frequency", "months", "provenance_ref"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "applies_to": {
+          "const": "index_composition",
+          "description": "An index-composition review schedule. It is never the length of a transition evaluation period."
+        },
+        "frequency": { "enum": ["quarterly", "semi_annual", "annual", "monthly"] },
+        "months": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 1, "maximum": 12 }
+        },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "evaluationPeriod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "duration", "schedule", "provenance_ref", "mapping_to_index_review"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "duration": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["unit", "length"],
+              "properties": {
+                "unit": { "enum": ["days", "months"] },
+                "length": { "type": "integer", "minimum": 1 }
+              }
+            }
+          ],
+          "description": "A structured duration or null. A cadence token such as \"quarterly\" is unrepresentable here by construction."
+        },
+        "schedule": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["months"],
+              "properties": {
+                "months": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": { "type": "integer", "minimum": 1, "maximum": 12 }
+                }
+              }
+            }
+          ]
+        },
+        "provenance_ref": { "$ref": "#/$defs/identifier" },
+        "open_decision_ref": { "$ref": "#/$defs/identifier" },
+        "mapping_to_index_review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "provenance_ref"],
+          "properties": {
+            "status": { "enum": ["established", "not_established"] },
+            "provenance_ref": { "$ref": "#/$defs/identifier" },
+            "open_decision_ref": { "$ref": "#/$defs/identifier" }
+          }
+        }
+      }
+    },
+
+    "qualifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "summary", "provenance_ref"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "subcategory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "provenance_ref"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": { "type": "string", "minLength": 1 },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "nexusRelation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relation", "entity_role", "activity", "provenance_ref", "operational_effect"],
+      "properties": {
+        "relation": { "enum": ["activity_by_entity_type"] },
+        "entity_role": { "type": "string", "minLength": 1 },
+        "activity": { "type": "string", "minLength": 1 },
+        "provenance_ref": { "$ref": "#/$defs/identifier" },
+        "operational_effect": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "provenance_ref"],
+          "properties": {
+            "status": { "enum": ["established", "unresolved"] },
+            "provenance_ref": { "$ref": "#/$defs/identifier" }
+          }
+        }
+      }
+    },
+
+    "excludedActivity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "edition_ref", "provenance_ref"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": { "type": "string", "minLength": 1 },
+        "edition_ref": { "$ref": "#/$defs/identifier" },
+        "provenance_ref": { "$ref": "#/$defs/identifier" },
+        "qualifiers": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/qualifier" } },
+        "subcategories": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/subcategory" } },
+        "nexus_relations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nexusRelation" } }
+      }
+    },
+
+    "historicalActivity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "edition_ref", "normative_use", "provenance_ref"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": { "type": "string", "minLength": 1 },
+        "edition_ref": { "$ref": "#/$defs/identifier" },
+        "normative_use": { "const": "not_operative" },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "categoryMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "relation", "from", "to", "provenance_ref", "consequence"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "relation": { "enum": ["split", "narrowed", "reworded"] },
+        "from": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["edition_ref", "activity_ref"],
+          "properties": {
+            "edition_ref": { "$ref": "#/$defs/identifier" },
+            "activity_ref": { "$ref": "#/$defs/identifier" }
+          }
+        },
+        "to": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["edition_ref", "activity_ref"],
+            "properties": {
+              "edition_ref": { "$ref": "#/$defs/identifier" },
+              "activity_ref": { "$ref": "#/$defs/identifier" }
+            }
+          }
+        },
+        "provenance_ref": { "$ref": "#/$defs/identifier" },
+        "consequence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["summary", "provenance_ref"],
+          "properties": {
+            "summary": { "type": "string", "minLength": 1 },
+            "provenance_ref": { "$ref": "#/$defs/identifier" }
+          }
+        }
+      }
+    },
+
+    "conditionClause": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "input_ref", "operator", "value", "provenance_ref"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "input_ref": { "$ref": "#/$defs/identifier" },
+        "operator": { "enum": ["equals", "not_equals", "in"] },
+        "value": {},
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "conditionSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completeness", "logic", "clauses", "provenance_ref"],
+      "properties": {
+        "completeness": { "enum": ["complete", "incomplete"] },
+        "logic": {
+          "type": ["string", "null"],
+          "enum": ["all_of", "any_of", null],
+          "description": "Legal only when the specification is complete. An empty all_of would be vacuously true, so an empty clause list is unrepresentable in either state."
+        },
+        "clauses": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/$defs/conditionClause" }
+        },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "completeness": { "const": "incomplete" } },
+            "required": ["completeness"]
+          },
+          "then": {
+            "properties": {
+              "logic": { "type": "null" },
+              "clauses": { "type": "null" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "completeness": { "const": "complete" } },
+            "required": ["completeness"]
+          },
+          "then": {
+            "properties": {
+              "logic": { "enum": ["all_of", "any_of"] },
+              "clauses": { "type": "array", "minItems": 1 }
+            }
+          }
+        }
+      ]
+    },
+
+    "conditionalEligibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "effect",
+        "applies_to_activity_ref",
+        "applies_to_provenance_ref",
+        "depends_on_inputs",
+        "condition_specification"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "effect": { "enum": ["overrides_exclusion"] },
+        "applies_to_activity_ref": { "$ref": "#/$defs/nullableIdentifier" },
+        "applies_to_provenance_ref": { "$ref": "#/$defs/identifier" },
+        "depends_on_inputs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "condition_specification": { "$ref": "#/$defs/conditionSpecification" },
+        "open_decision_ref": { "$ref": "#/$defs/identifier" }
+      }
+    },
+
+    "businessActivityScreen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["excluded_activities", "tolerance_tests"],
+      "properties": {
+        "excluded_activities": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/excludedActivity" }
+        },
+        "historical_activities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/historicalActivity" }
+        },
+        "category_mappings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/categoryMapping" }
+        },
+        "conditional_eligibility": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/conditionalEligibility" }
+        },
+        "tolerance_tests": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ratioScreen" },
+          "description": "Plural so a standard with more than one activity benchmark tier needs no structural change."
+        }
+      }
+    },
+
+    "immediateTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["availability", "provenance_ref"],
+      "properties": {
+        "availability": {
+          "enum": ["present", "absent", "not_established"],
+          "description": "Operational vocabulary only. Documentary silence is not_established; only an affirmative documented basis yields absent."
+        },
+        "absence_basis": { "enum": ["superseded", "documented_absent"] },
+        "superseded_by_change_ref": { "$ref": "#/$defs/identifier" },
+        "provenance_ref": { "$ref": "#/$defs/identifier" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "availability": { "const": "present" } },
+            "required": ["availability"]
+          },
+          "then": {
+            "allOf": [
+              { "not": { "required": ["absence_basis"] } },
+              { "not": { "required": ["superseded_by_change_ref"] } }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": { "availability": { "const": "absent" } },
+            "required": ["availability"]
+          },
+          "then": { "required": ["absence_basis"] }
+        },
+        {
+          "if": {
+            "properties": {
+              "availability": { "const": "absent" },
+              "absence_basis": { "const": "superseded" }
+            },
+            "required": ["availability", "absence_basis"]
+          },
+          "then": { "required": ["superseded_by_change_ref"] }
+        },
+        {
+          "if": {
+            "properties": {
+              "availability": { "const": "absent" },
+              "absence_basis": { "const": "documented_absent" }
+            },
+            "required": ["availability", "absence_basis"]
+          },
+          "then": { "not": { "required": ["superseded_by_change_ref"] } }
+        },
+        {
+          "if": {
+            "properties": { "availability": { "const": "not_established" } },
+            "required": ["availability"]
+          },
+          "then": {
+            "allOf": [
+              { "not": { "required": ["absence_basis"] } },
+              { "not": { "required": ["superseded_by_change_ref"] } }
+            ]
+          }
+        },
+        {
+          "if": { "required": ["superseded_by_change_ref"] },
+          "then": {
+            "required": ["availability", "absence_basis"],
+            "properties": {
+              "availability": { "const": "absent" },
+              "absence_basis": { "const": "superseded" }
+            }
+          }
+        }
+      ]
+    },
+
+    "transitionTrigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["counter_input_ref", "required_consecutive_periods", "period_ref"],
+      "properties": {
+        "counter_input_ref": { "$ref": "#/$defs/identifier" },
+        "required_consecutive_periods": { "type": "integer", "minimum": 1 },
+        "period_ref": {
+          "$ref": "#/$defs/identifier",
+          "description": "Must target the evaluation-period object, never the index-review object."
+        }
+      }
+    },
+
+    "statusTransitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state_input_ref", "from_compliant_to_non_compliant", "from_non_compliant_to_compliant"],
+      "properties": {
+        "state_input_ref": { "$ref": "#/$defs/identifier" },
+        "from_compliant_to_non_compliant": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tolerance_band", "within_band", "beyond_band"],
+          "properties": {
+            "tolerance_band": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["width", "unit", "provenance_ref"],
+              "properties": {
+                "width": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+                "unit": { "const": "same_as_threshold" },
+                "provenance_ref": { "$ref": "#/$defs/identifier" }
+              }
+            },
+            "within_band": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["status_retained", "trigger", "provenance_ref"],
+              "properties": {
+                "status_retained": { "type": "boolean" },
+                "trigger": { "$ref": "#/$defs/transitionTrigger" },
+                "provenance_ref": { "$ref": "#/$defs/identifier" }
+              }
+            },
+            "beyond_band": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["immediate_transition"],
+              "properties": {
+                "immediate_transition": { "$ref": "#/$defs/immediateTransition" }
+              }
+            }
+          }
+        },
+        "from_non_compliant_to_compliant": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["requires", "immediate_transition"],
+          "properties": {
+            "requires": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["test", "counter_input_ref", "required_consecutive_periods", "period_ref", "provenance_ref"],
+              "properties": {
+                "test": { "const": "ordinary_threshold" },
+                "counter_input_ref": { "$ref": "#/$defs/identifier" },
+                "required_consecutive_periods": { "type": "integer", "minimum": 1 },
+                "period_ref": { "$ref": "#/$defs/identifier" },
+                "provenance_ref": { "$ref": "#/$defs/identifier" }
+              }
+            },
+            "immediate_transition": { "$ref": "#/$defs/immediateTransition" }
+          }
+        }
+      }
+    },
+
+    "contextualClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "summary", "provenance_ref"],
+      "description": "Documentary context attached to a screen. Carries no threshold, comparator, operand, transition, condition, verdict or policy -- the closed property set makes any of those unrepresentable. A contextual claim is never an active rule.",
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One concise Hujja paraphrase. Never text copied from the standard."
+        },
+        "provenance_ref": {
+          "$ref": "#/$defs/identifier",
+          "description": "Exactly one provenance entry per claim, so each claim carries its own documentary status."
+        }
+      }
+    },
+
     "ratioScreen": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "label", "description", "numerator", "denominator", "comparator", "threshold", "evaluation_frequency"],
+      "required": [
+        "id",
+        "label",
+        "description",
+        "numerator_ref",
+        "denominator_ref",
+        "comparator",
+        "comparator_provenance_ref",
+        "threshold",
+        "threshold_provenance_ref"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "id": { "$ref": "#/$defs/identifier" },
         "label": { "type": "string", "minLength": 1 },
-        "description": { "type": "string", "minLength": 1 },
-        "numerator": { "$ref": "#/$defs/factExpression" },
-        "denominator": { "$ref": "#/$defs/factExpression" },
-        "comparator": { "type": "string", "enum": ["<", "<=", ">", ">=", "=="] },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Hujja's own paraphrase -- never text copied from the standard."
+        },
+        "numerator_ref": { "$ref": "#/$defs/identifier" },
+        "denominator_ref": { "$ref": "#/$defs/identifier" },
+        "comparator": { "enum": ["<", "<=", ">", ">=", "=="] },
+        "comparator_provenance_ref": { "$ref": "#/$defs/identifier" },
         "threshold": {
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "Expressed as a fraction, not a percentage. 0.33 means 33%."
+          "description": "A fraction, not a percentage. 0.33 means 33%."
         },
-        "evaluation_frequency": {
-          "type": ["string", "null"],
-          "enum": ["annual", "quarterly", "monthly", null],
-          "description": "How often the standard re-evaluates this screen. null means the cadence has NOT been verified against the official document (TO VERIFY). The slot is required so an unverified cadence is explicit rather than invisible."
+        "threshold_provenance_ref": { "$ref": "#/$defs/identifier" },
+        "active_ratio_count_provenance_ref": { "$ref": "#/$defs/identifier" },
+        "contextual_claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/contextualClaim" },
+          "description": "Documentary context about this screen, one claim per object, each with its own provenance. Non-executable."
         },
-        "transition_buffer": { "$ref": "#/$defs/transitionBuffer" }
+        "status_transitions": { "$ref": "#/$defs/statusTransitions" }
+      }
+    },
+
+    "methodologyChangeRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "normative_use",
+        "effective_date",
+        "effective_moment",
+        "replaced",
+        "replaced_by",
+        "source_editions",
+        "provenance_ref",
+        "scope_limit"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "normative_use": {
+          "const": "not_operative",
+          "description": "Historical records are never executable as active rules."
+        },
+        "effective_date": { "type": "string", "format": "date" },
+        "effective_moment": { "enum": ["after_close", "before_open", "unspecified"] },
+        "replaced": { "type": "string", "minLength": 1 },
+        "replaced_by": { "type": "string", "minLength": 1 },
+        "source_editions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "provenance_ref": { "$ref": "#/$defs/identifier" },
+        "scope_limit": { "type": "string", "minLength": 1 }
+      }
+    },
+
+    "purificationMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "method_kind", "label", "description", "provenance_ref"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "method_kind": { "enum": ["dividend_ratio", "holding_based"] },
+        "label": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "provenance_ref": { "$ref": "#/$defs/identifier" },
+        "operand_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        }
       }
     }
   }

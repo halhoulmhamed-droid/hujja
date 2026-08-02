@@ -64,14 +64,19 @@ The engine is built on five commitments:
 
 **Two facts many screeners still get wrong** (verified in the February 2026 S&P DJI document):
 
-- DJIM's old "three ratios < 33%" description is **obsolete**. The accounts-receivable screen was
-  removed effective March 2023, and the cash + interest-bearing-securities screen effective
-  September 2023. A single *Leverage Compliance* filter remains.
-- DJIM applies a **transition buffer**: a stock crossing the 33% line keeps its previous status if
-  the ratio stays within 2 percentage points of the limit, and only flips after 3 consecutive
-  evaluation periods (immediately if beyond the buffer). Faithful index replication therefore
-  requires *state*. Hujja's DJIM rule file exposes both a stateless point-in-time test and this
-  stateful index-replication mode, explicitly and separately.
+- DJIM's old "three ratios < 33%" description is **obsolete**: a single *Leverage Compliance*
+  filter remains, and that much is established by an edition and page locator. The two removal
+  dates usually quoted alongside it — an accounts-receivable screen in March 2023 and a
+  cash + interest-bearing-securities screen in September 2023 — are **carried forward from earlier
+  work in this repository and were not re-established** by the evidence behind the current rule
+  file. They are recorded there as inherited, unresolved context rather than as verified facts.
+- DJIM applies a **transition buffer, and it is not symmetric.** Going *out* of compliance, a stock
+  crossing the 33% line keeps its previous status while the ratio stays within 2 percentage points
+  of the limit, flips after 3 consecutive evaluation periods, and flips immediately beyond the
+  buffer. Coming *back*, there is no immediate route: the ordinary test must be satisfied for 3
+  consecutive evaluation periods. The former immediate re-entry route was replaced effective
+  15 September 2023 and Hujja records it as a historical, non-operative entry. Faithful index
+  replication therefore requires *state*, and the two directions are encoded separately.
 
 ### Roadmap standards — encoded only after verifying the current official version
 
@@ -284,20 +289,81 @@ maintainer or contributor accepts liability for decisions made on the basis of t
 its outputs. Before acting, consult a qualified Shariah scholar and a licensed financial
 professional in your jurisdiction.
 
+<a id="source-verification-log"></a>
+
 ## Source verification log
 
 Hujja holds itself to the standard it asks of others: every claim above is dated, and this table
 is re-checked at each release. A source not re-verified for a release is marked as such rather
 than silently carried over.
 
+Every `source_evidence` entry in a rule file points back to this section. Each one names an
+official methodology edition and a section/page locator, so a reader who obtains the edition can
+check the claim without any private material.
+
 | Source | Version encoded | Last verified | Status |
 |---|---|---|---|
-| S&P DJI — DJIM Methodology | February 2026 | 2026-07-28 | Full document read; ready to encode |
+| S&P DJI — DJIM Methodology | February 2026 | 2026-07-28 | Encoded. Per-claim locators ship in the rule file; the categories below say what each locator does and does not establish |
 | AAOIFI — Shariʿah Standard No. 21 (w/ SS 59) | Current e-standards edition | 2026-07-28 | Portal & free access confirmed; thresholds to re-check in the official text before encoding |
 | SC Malaysia — SAC list | November 2025 (effective 28 Nov 2025) | 2026-07-28 | Official page confirmed; May 2026 list to be pulled |
 | FTSE IdealRatings Islamic Index Series | Ground rules (current) | 2026-07-28 | Link confirmed; ratios not yet read in full |
 | FTSE Shariah (Yasaar) | — | Not verified | Blocking before encoding |
 | MSCI Islamic Index Series / M Series | Two-series split confirmed | 2026-07-28 | Denominators confirmed on MSCI's index page; thresholds not yet read in the methodology PDF |
+
+### What the DJIM rule file claims, and at what strength
+
+Resolution below is stated **against the declared reviewed evidence set** for the rule file — the
+editions and locators it names. Where a claim carries no locator, that means this evidence set does
+not establish it. It is not a claim that every possible source is silent.
+
+**Supported by an edition and page locator.** The single active accounting-based ratio screen; its
+33% threshold and strictly-below comparator; the 2-percentage-point transition band; both
+transition directions and the three-consecutive-period counts; the trailing 24-month average
+denominator and its trailing-average form; the quarterly index-composition review schedule; the
+gambling, adult entertainment, pork-related and weapons categories, the weapons deployment-purpose
+qualifier, the pork-selling nexus, and the split of the earlier entertainment category into two;
+the **5% revenue-tolerance level** and the February 2026 revenue-tolerance denominator label; the
+dependence on an external classification and the two observed classification codes.
+
+Each of these claims carries provenance scoped to that claim alone. The 5% threshold's provenance,
+for instance, establishes the tolerance **level** and nothing else — not the comparator applied to
+it and not the measurement basis of its denominator, which are separate claims listed below.
+
+**Partially supported.** None at present. The category is retained because the contract expresses
+it and a future claim may need it.
+
+**Inherited from the tracked rule file, without a locator in this evidence set.** The leverage
+numerator's label and definition; the alcohol, tobacco and e-cigarettes, recreational cannabis, and
+conventional financial services categories; the revenue-tolerance comparator; and the numerator and
+denominator compositions of the revenue-tolerance test.
+
+Also inherited, and now recorded as three individually provenanced contextual claims on the
+leverage screen rather than as prose:
+
+- an **accounts-receivable** screen was removed in **March 2023**;
+- a cash-plus-interest-bearing-securities screen was removed in **September 2023**;
+- the separately published dividend ratio is a **purification aid** rather than a compliance ratio.
+
+All of these values are preserved and computable, and each is marked unresolved rather than
+presented as source-established. Also inherited: the methodology URL and the 2026-07-28
+verification date shown above. The URL is carried as inherited tracked content only — it is **not**
+treated as an identifier of the February 2026 edition, its edition specificity is unresolved, and
+neither it nor the inherited date is presented as newly verified for that edition.
+
+**Unresolved and recorded as open decisions.** The duration and scheduling of an evaluation period;
+whether one evaluation period maps to one quarterly index review; the observation interval used to
+build the trailing 24-month average; the identity of the external classification scheme and the
+number of relevant assignments per entity; the conditions of the external-classification
+eligibility exception and which excluded activity it qualifies; the delivery channel and adapter
+contract for classification assignments; and engine behaviour when a required input is absent. None
+of these is guessed, and none is resolved by inference from another.
+
+**Historical, non-operative.** The former immediate re-entry route replaced effective
+15 September 2023, and the earlier entertainment category. Both are recorded so the change is
+visible, and neither is executable as an active rule.
+
+**Review status.** The DJIM rule file remains `unreviewed`. Representing inherited content more
+precisely does not make it expert-reviewed, and no rule file is promoted by a format migration.
 
 ## References (official sources)
 
