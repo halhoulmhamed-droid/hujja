@@ -16,18 +16,19 @@ verdict per standard, never a merged black-box answer.**
 > buy, sell, or hold any security. Always consult a qualified Shariah scholar and a licensed
 > financial professional. See the full [Disclaimer](#disclaimer).
 
-**Status: pre-alpha (design phase).** No code has been published yet. This README is the public
-contract that the first release will honor.
+**Status: pre-alpha (contract implementation).** The versioned DJIM rule file, JSON Schema, fact
+model, and validation suite are published. The loader and execution engine are not yet implemented.
 
 ---
 
 ## Why this exists
 
-Every serious halal stock screener today — Zoya, Musaffa, Islamicly, Finispia, Halal Terminal,
-IdealRatings — is closed-source. You receive a verdict; you cannot audit the threshold, the
-denominator, the averaging window, or the data snapshot behind it. As of July 2026, we found no
-public project that encodes the major Shariah screening standards as auditable open-source logic
-(surveyed: the GitHub `islamic-finance` topic, PyPI, and the official MCP registry).
+Most widely used commercial halal stock screeners — Zoya, Musaffa, Islamicly, Finispia, Halal
+Terminal, IdealRatings — are closed-source. You receive a verdict; you cannot audit the threshold,
+the denominator, the averaging window, or the data snapshot behind it. Open-source screeners do
+exist. Hujja is designed around a narrower problem: auditable, versioned per-standard rules
+carrying claim-level provenance, explicit uncertainty, stateful transition semantics, and
+reproducible evidence trails.
 
 That opacity hides something specific: **the same company can be compliant under one standard and
 non-compliant under another.** Thresholds differ, denominators differ (market capitalization vs.
@@ -101,7 +102,7 @@ and thresholds are to be read from the current methodology document before encod
 assets and debt/total assets each < 33%; plus a qualitative screen. The SAC's official
 semi-annual list (effective the last Friday of May and November; the November 2025 list took
 effect 28 Nov 2025, with 859 of 1,073 securities ≈ 80% classified compliant) doubles as Hujja's
-**external validation benchmark** — no competitor publishes such a check.
+**external validation benchmark** — an independent published list to check encoded rules against.
 [Official page](https://www.sc.com.my/development/icm/shariah-compliant-securities).
 
 Each rule file records the exact methodology version and date it encodes. When a standard changes,
